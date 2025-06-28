@@ -42,12 +42,23 @@ const ProcessingPanel = ({
           </p>
         </div>
 
-        {!isProcessing ? (
+{!isProcessing ? (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-4"
           >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-midnight-600">Wall Detection</span>
+                <span className="text-bright-600 font-medium">Enhanced</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-midnight-600">Surface Isolation</span>
+                <span className="text-carrot-600 font-medium">Precise</span>
+              </div>
+            </div>
+            
             <Button
               onClick={onProcess}
               disabled={disabled}
@@ -60,7 +71,7 @@ const ProcessingPanel = ({
             
             <div className="text-center">
               <p className="text-sm text-midnight-500">
-                Processing typically takes 10-30 seconds
+                Enhanced processing with wall isolation
               </p>
             </div>
           </motion.div>
@@ -107,23 +118,30 @@ const ProcessingPanel = ({
           </motion.div>
         )}
 
-        <div className="border-t border-cloud-300 pt-4">
+<div className="border-t border-cloud-300 pt-4">
           <div className="grid grid-cols-2 gap-4 text-center">
             <div>
               <div className="text-2xl font-bold text-bright-600 font-display">
-                AI-Powered
+                Precision
               </div>
               <div className="text-sm text-midnight-600">
-                Wall Detection
+                Wall Targeting
               </div>
             </div>
             <div>
               <div className="text-2xl font-bold text-carrot-600 font-display">
-                Realistic
+                Advanced
               </div>
               <div className="text-sm text-midnight-600">
-                Lighting Match
+                Surface Isolation
               </div>
+            </div>
+          </div>
+          
+          <div className="mt-4 text-center">
+            <div className="inline-flex items-center space-x-2 text-xs text-midnight-500 bg-cloud-50 rounded-full px-3 py-1">
+              <ApperIcon name="Target" className="w-3 h-3" />
+              <span>Excludes floors, furniture & objects</span>
             </div>
           </div>
         </div>

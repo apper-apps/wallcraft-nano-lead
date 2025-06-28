@@ -14,8 +14,10 @@ const MainWorkspace = () => {
   const [surfaceImage, setSurfaceImage] = useState(null)
   const [processedImage, setProcessedImage] = useState(null)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [processingStage, setProcessingStage] = useState('')
+const [processingStage, setProcessingStage] = useState('')
   const [processingProgress, setProcessingProgress] = useState(0)
+  const [wallSelection, setWallSelection] = useState([])
+  const [selectionMode, setSelectionMode] = useState(false)
 
   const handleFileToDataURL = (file) => {
     return new Promise((resolve) => {
@@ -49,11 +51,18 @@ const handleProcess = async () => {
     setProcessingProgress(0)
     
     try {
-      // Use actual image processing with progress and stage callbacks
+      // Use actual image processing with wall selection data
+      const processingOptions = {
+        wallSelection: wallSelection.length > 0 ? wallSelection : null,
+        textureOpacity: 0.7,
+        lightingMatch: true,
+        perspectiveCorrection: true
+      }
+      
       const result = await processImages(
         roomImage, 
         surfaceImage, 
-        {}, 
+        processingOptions, 
         setProcessingProgress, 
         setProcessingStage
       )
@@ -139,11 +148,15 @@ const handleProcess = async () => {
             className="flex-1"
           />
         ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 h-full">
+<div className="grid grid-cols-1 xl:grid-cols-2 gap-6 h-full">
             <ImageCanvas
               image={roomImage}
               title="Room Preview"
               className="h-full min-h-[400px]"
+              selectionMode={selectionMode}
+              wallSelection={wallSelection}
+              onWallSelectionChange={setWallSelection}
+              onSelectionModeChange={setSelectionMode}
             />
             <ImageCanvas
               image={surfaceImage}
