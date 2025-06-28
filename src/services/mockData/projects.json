@@ -1,0 +1,50 @@
+[
+  {
+    "Id": 1,
+    "name": "Living Room Transformation",
+    "roomImage": null,
+    "surfaceImage": null,
+    "processedImage": null,
+    "wallMask": null,
+    "timestamp": "2024-01-15T10:30:00Z",
+    "status": "completed",
+    "settings": {
+      "lightingMatch": true,
+      "perspectiveCorrection": true,
+      "edgeSmoothing": 85,
+      "outputQuality": 95
+    }
+  },
+  {
+    "Id": 2,
+    "name": "Bedroom Accent Wall",
+    "roomImage": null,
+    "surfaceImage": null,
+    "processedImage": null,
+    "wallMask": null,
+    "timestamp": "2024-01-14T14:45:00Z",
+    "status": "in_progress",
+    "settings": {
+      "lightingMatch": true,
+      "perspectiveCorrection": false,
+      "edgeSmoothing": 70,
+      "outputQuality": 90
+    }
+  },
+  {
+    "Id": 3,
+    "name": "Kitchen Backsplash Design",
+    "roomImage": null,
+    "surfaceImage": null,
+    "processedImage": null,
+    "wallMask": null,
+    "timestamp": "2024-01-13T09:15:00Z",
+    "status": "draft",
+    "settings": {
+      "lightingMatch": false,
+      "perspectiveCorrection": true,
+      "edgeSmoothing": 90,
+      "outputQuality": 85
+    }
+  }
+]
