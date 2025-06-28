@@ -246,9 +246,11 @@ export const getProcessingStatus = async (processId) => {
     status: 'completed',
     progress: 100,
     stage: 'complete',
-    estimatedTimeRemaining: 0,
+estimatedTimeRemaining: 0,
     error: null
   }
+}
+
 /**
  * Create wall mask for precise targeting
  * @param {HTMLImageElement} roomImage - Room image element
@@ -455,7 +457,5 @@ export const validateWallSelection = (wallSelection) => {
       return { isValid: false, error: 'Rectangle must have x, y, width, and height' }
     }
   }
-  
-  return { isValid: true, useAutoDetection: false }
-}
+return { isValid: true, useAutoDetection: false }
 }
