@@ -187,10 +187,10 @@ useEffect(() => {
       <div 
         ref={containerRef}
         className="relative w-full h-96 bg-cloud-100 overflow-hidden canvas-container"
-        onMouseDown={handleMouseDown}
+onMouseDown={handleMouseDown}
         style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
       >
-{image ? (
+        {image && typeof image === 'string' && image.trim() !== '' ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

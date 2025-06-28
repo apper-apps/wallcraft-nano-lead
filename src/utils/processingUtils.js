@@ -63,11 +63,11 @@ export const processImages = async (roomImage, surfaceImage, options = {}, onPro
     for (let i = 0; i <= steps; i++) {
       const progress = startProgress + (endProgress - startProgress) * (i / steps)
       onProgress?.(Math.min(progress, 100))
-      await new Promise(resolve => setTimeout(resolve, stepDuration))
+await new Promise(resolve => setTimeout(resolve, stepDuration))
     }
-}
+  }
 
-// Perform actual texture transformation with wall targeting
+  // Perform actual texture transformation with wall targeting
   const processedImageUrl = await createTextureBlendedImage(roomImage, surfaceImage, options)
   return processedImageUrl
 }
@@ -91,7 +91,7 @@ const createTextureBlendedImage = async (roomImageUrl, surfaceImageUrl, options 
     const checkImagesLoaded = () => {
       imagesLoaded++
       if (imagesLoaded === 2) {
-        try {
+try {
           // Set canvas size to room image dimensions
           canvas.width = roomImg.width
           canvas.height = roomImg.height
@@ -99,19 +99,17 @@ const createTextureBlendedImage = async (roomImageUrl, surfaceImageUrl, options 
           // Draw room image as base
           ctx.drawImage(roomImg, 0, 0)
           
+          // Create pattern from surface image
+          const pattern = ctx.createPattern(surfaceImg, 'repeat')
+          if (!pattern) {
+            throw new Error('Failed to create texture pattern from surface image')
+          }
+          
           // Apply wall detection and masking
           const wallMask = createWallMask(roomImg, options.wallSelection)
           
-          // Create pattern from surface image
-          const pattern = ctx.createPattern(surfaceImg, 'repeat')
-          
-          // Apply wall mask for precise targeting
-          if (wallMask) {
-            ctx.save()
-            ctx.globalCompositeOperation = 'source-in'
-            ctx.drawImage(wallMask, 0, 0)
-            ctx.restore()
-          }
+          // Save the current canvas state
+          ctx.save()
           
           // Apply texture blend mode for realistic surface application
           ctx.globalCompositeOperation = 'multiply'
@@ -120,24 +118,44 @@ const createTextureBlendedImage = async (roomImageUrl, surfaceImageUrl, options 
           // Fill with surface pattern only in wall areas
           if (options.wallSelection && options.wallSelection.length > 0) {
             applyTextureToSelection(ctx, pattern, options.wallSelection)
+          } else if (wallMask) {
+            // Use auto-detected wall areas
+            ctx.globalCompositeOperation = 'source-atop'
+            ctx.drawImage(wallMask, 0, 0)
+            ctx.globalCompositeOperation = 'multiply'
+            ctx.fillStyle = pattern
+            ctx.fillRect(0, 0, canvas.width, canvas.height)
           } else {
+            // Apply texture to entire image
             ctx.fillStyle = pattern
             ctx.fillRect(0, 0, canvas.width, canvas.height)
           }
           
-          // Restore normal blending for any additional operations
-          ctx.globalCompositeOperation = 'source-over'
-          ctx.globalAlpha = 1.0
+          // Restore canvas state
+          ctx.restore()
+          
+          // Verify canvas has content before converting
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+          const hasContent = imageData.data.some((value, index) => {
+            return index % 4 !== 3 && value !== 0 // Check RGB channels (skip alpha)
+          })
+          
+          if (!hasContent) {
+            throw new Error('Canvas is blank after processing - check image sources and processing options')
+          }
           
           // Convert canvas to data URL
           const resultDataUrl = canvas.toDataURL('image/jpeg', 0.9)
+          if (!resultDataUrl || resultDataUrl === 'data:,') {
+            throw new Error('Failed to convert processed image to data URL')
+          }
+          
           resolve(resultDataUrl)
         } catch (error) {
           reject(new Error('Failed to process images: ' + error.message))
         }
       }
     }
-    
     roomImg.onload = checkImagesLoaded
     surfaceImg.onload = checkImagesLoaded
     
