@@ -7,6 +7,7 @@ import SplitPreview from '@/components/molecules/SplitPreview'
 import ProcessingPanel from '@/components/molecules/ProcessingPanel'
 import ExportPanel from '@/components/molecules/ExportPanel'
 import Card from '@/components/atoms/Card'
+import { processImages } from '@/utils/processingUtils'
 
 const MainWorkspace = () => {
   const [roomImage, setRoomImage] = useState(null)
@@ -38,33 +39,7 @@ const MainWorkspace = () => {
     setProcessedImage(null)
   }, [])
 
-  const simulateProcessing = async () => {
-    const stages = [
-      { key: 'analyzing', duration: 2000, progress: 25 },
-      { key: 'detecting', duration: 3000, progress: 50 },
-      { key: 'mapping', duration: 2500, progress: 75 },
-      { key: 'rendering', duration: 2000, progress: 95 },
-      { key: 'complete', duration: 500, progress: 100 }
-    ]
-
-    for (const stage of stages) {
-      setProcessingStage(stage.key)
-      
-      // Animate progress
-      const startProgress = stage.progress - 25
-      const endProgress = stage.progress
-      const steps = 20
-      const stepDuration = stage.duration / steps
-      
-      for (let i = 0; i <= steps; i++) {
-        const progress = startProgress + (endProgress - startProgress) * (i / steps)
-        setProcessingProgress(progress)
-        await new Promise(resolve => setTimeout(resolve, stepDuration))
-      }
-    }
-  }
-
-  const handleProcess = async () => {
+const handleProcess = async () => {
     if (!roomImage || !surfaceImage) {
       toast.error('Please upload both room and surface images')
       return
@@ -74,14 +49,19 @@ const MainWorkspace = () => {
     setProcessingProgress(0)
     
     try {
-      await simulateProcessing()
+      // Use actual image processing with progress and stage callbacks
+      const result = await processImages(
+        roomImage, 
+        surfaceImage, 
+        {}, 
+        setProcessingProgress, 
+        setProcessingStage
+      )
       
-      // For demo purposes, use the room image as the "processed" result
-      // In a real app, this would be the output from the processing service
-      setProcessedImage(roomImage)
-      
+      setProcessedImage(result)
       toast.success('Transformation completed successfully!')
     } catch (error) {
+      console.error('Processing error:', error)
       toast.error('Processing failed. Please try again.')
     } finally {
       setIsProcessing(false)

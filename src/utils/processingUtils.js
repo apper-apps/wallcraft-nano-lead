@@ -53,11 +53,73 @@ export const processImages = async (roomImage, surfaceImage, options = {}, onPro
       onProgress?.(Math.min(progress, 100))
       await new Promise(resolve => setTimeout(resolve, stepDuration))
     }
-  }
+}
 
-  // For demo purposes, return the room image as the "processed" result
-  // In a real application, this would call an actual image processing API
-  return roomImage
+  // Perform actual texture transformation
+  const processedImageUrl = await createTextureBlendedImage(roomImage, surfaceImage, options)
+  return processedImageUrl
+}
+
+/**
+ * Create a texture-blended image using canvas operations
+ * @param {string} roomImageUrl - Room image data URL
+ * @param {string} surfaceImageUrl - Surface image data URL
+ * @param {Object} options - Processing options
+ * @returns {Promise<string>} Promise that resolves to blended image data URL
+ */
+const createTextureBlendedImage = async (roomImageUrl, surfaceImageUrl, options = {}) => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    
+    const roomImg = new Image()
+    const surfaceImg = new Image()
+    
+    let imagesLoaded = 0
+    const checkImagesLoaded = () => {
+      imagesLoaded++
+      if (imagesLoaded === 2) {
+        try {
+          // Set canvas size to room image dimensions
+          canvas.width = roomImg.width
+          canvas.height = roomImg.height
+          
+          // Draw room image as base
+          ctx.drawImage(roomImg, 0, 0)
+          
+          // Create pattern from surface image
+          const pattern = ctx.createPattern(surfaceImg, 'repeat')
+          
+          // Apply texture blend mode for realistic surface application
+          ctx.globalCompositeOperation = 'multiply'
+          ctx.globalAlpha = 0.7 // Adjustable opacity for texture blend
+          
+          // Fill with surface pattern
+          ctx.fillStyle = pattern
+          ctx.fillRect(0, 0, canvas.width, canvas.height)
+          
+          // Restore normal blending for any additional operations
+          ctx.globalCompositeOperation = 'source-over'
+          ctx.globalAlpha = 1.0
+          
+          // Convert canvas to data URL
+          const resultDataUrl = canvas.toDataURL('image/jpeg', 0.9)
+          resolve(resultDataUrl)
+        } catch (error) {
+          reject(new Error('Failed to process images: ' + error.message))
+        }
+      }
+    }
+    
+    roomImg.onload = checkImagesLoaded
+    surfaceImg.onload = checkImagesLoaded
+    
+    roomImg.onerror = () => reject(new Error('Failed to load room image'))
+    surfaceImg.onerror = () => reject(new Error('Failed to load surface image'))
+    
+    roomImg.src = roomImageUrl
+    surfaceImg.src = surfaceImageUrl
+  })
 }
 
 /**
