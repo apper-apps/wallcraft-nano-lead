@@ -67,11 +67,22 @@ const handleProcess = async () => {
         setProcessingStage
       )
       
-      setProcessedImage(result)
+setProcessedImage(result)
       toast.success('Transformation completed successfully!')
     } catch (error) {
       console.error('Processing error:', error)
-      toast.error('Processing failed. Please try again.')
+      
+      // Provide more specific error messages
+      let errorMessage = 'Processing failed. Please try again.'
+      if (error.message.includes('wall')) {
+        errorMessage = 'Could not detect wall surfaces. Try uploading a clearer room image or manually select wall areas.'
+      } else if (error.message.includes('texture') || error.message.includes('pattern')) {
+        errorMessage = 'Failed to apply texture pattern. Please check your surface image and try again.'
+      } else if (error.message.includes('load')) {
+        errorMessage = 'Failed to load images. Please check file formats and try again.'
+      }
+      
+      toast.error(errorMessage)
     } finally {
       setIsProcessing(false)
       setProcessingStage('')
